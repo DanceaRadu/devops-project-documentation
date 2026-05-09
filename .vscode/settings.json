@@ -1,0 +1,30 @@
+{
+  "latex-workshop.view.pdf.viewer": "tab",
+
+  "latex-workshop.latex.outDir": "%DIR%/out",
+
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk-pdflatex",
+      "command": "latexmk",
+      "args": [
+        "-pdf",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-synctex=1",
+        "-outdir=out",
+        "%DOC%"
+      ]
+    },
+    {
+      "name": "bibtex",
+      "command": "bibtex",
+      "args": ["%DOCFILE%"]
+    }
+  ],
+
+  "latex-workshop.latex.recipes": [
+    { "name": "latexmk (pdfLaTeX)", "tools": ["latexmk-pdflatex"] },
+    { "name": "latexmk + BibTeX",   "tools": ["latexmk-pdflatex","bibtex","latexmk-pdflatex","latexmk-pdflatex"] }
+  ]
+}
