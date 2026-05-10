@@ -1,0 +1,50 @@
+server:
+  http_listen_port: 9080
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: docker-containers
+
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+
+  - job_name: npm-access-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: npm-access-logs
+          app: nginx-proxy-manager
+          __path__: /npm-logs/*access*.log
+    pipeline_stages:
+      - regex:
+          source: filename
+          expression: '.*/proxy-host-(?P<proxy_host_id>[0-9]+)_access.log'
+      - labels:
+          proxy_host_id:
+
+  - job_name: npm-error-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: npm-error-logs
+          app: nginx-proxy-manager
+          __path__: /npm-logs/*error*.log
+    pipeline_stages:
+      - regex:
+          source: filename
+          expression: '.*/proxy-host-(?P<proxy_host_id>[0-9]+)_error.log'
+      - labels:
+          proxy_host_id:
+      
