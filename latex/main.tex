@@ -276,10 +276,101 @@ certificate problems. The dashboard can be seen in figure \ref{fig:logging_dashb
 
 \section{Alert configuration}
 
+One of the most important aspects of a monitoring system is the ability to automatically detect abnormal behavior and notify 
+administrators before issues become critical. For this project, Grafana's built-in alerting system was used 
+together with Prometheus metrics in order to create meaningful infrastructure and application-level alerts.
+
+Alerts were configured directly inside Grafana panels using Prometheus queries and threshold-based conditions. 
+Notifications are delivered through both Discord webhooks and SMTP email integration.
+
+Figure \ref{fig:configured_alerts} shows the configured alerts inside Grafana.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{assets/configured_alerts.png}
+    \caption{Configured Grafana alerts}
+    \label{fig:configured_alerts}
+\end{figure}
+
 \subsection{Relevant alerts chosen}
+
+The selected alerts were designed to monitor both the infrastructure itself and the monitored backend application. As such, the
+following alerts were configured:
+
+\subsubsection{Unraid CPU Usage Alert}
+
+This alert monitors the CPU utilization of the Unraid host machine using Node Exporter metrics. The alert triggers whenever the 
+CPU usage exceeds 95\% for more than three minutes. This helps identify situations where containers or background processes 
+overload the server and potentially impact application performance.
+
+\subsubsection{Unraid RAM Usage Alert}
+
+This alert monitors the total RAM usage of the server. The alert is triggered whenever the RAM usage exceeds 95\% for more than 
+2 minutes. This is particularly important because high memory pressure can lead to container instability or 
+out-of-memory situations.
+
+\subsubsection{Array Free Space Alert}
+
+This alert monitors the available storage space on the server. Instead of using percentages, the alert was configured to 
+trigger whenever the available free space falls below 75GB. Using an absolute value is more practical for large storage 
+arrays because percentages can become misleading depending on the total disk size.
+
+\subsubsection{Beamful Backend Down Alert}
+
+This alert verifies whether Prometheus can successfully scrape metrics from the backend application. If the backend container 
+becomes unavailable or crashes, Prometheus is unable to reach the application metrics endpoint and the alert is triggered 
+automatically. This is one of the most important alerts because it immediately detects complete application outages. This
+alert is the only one that is configured to send notifications through both Discord and email, while the rest of the alerts 
+only send notifications through Discord.
+
+\subsubsection{Beamful JVM Heap Usage Alert}
+
+This alert monitors JVM heap memory utilization exposed through Spring Boot Actuator. The alert triggers whenever heap 
+usage exceeds 90\% of the configured JVM heap size. High heap usage may indicate memory leaks, excessive allocations or 
+insufficient JVM memory configuration.
+
+\subsubsection{Beamful 5xx Error Alert}
+
+This alert monitors backend HTTP 5xx server errors. The alert was configured to trigger whenever at least one 
+HTTP 5xx error occurs within a specified time interval. This allows immediate detection of backend failures, unhandled 
+exceptions or database-related issues.
+
+The metric is collected directly from the Spring Boot Actuator request statistics.
 
 \subsection{Example alert firing}
 
+In order to validate the monitoring system, multiple alerts were intentionally triggered and later resolved. For example, the backend 
+availability alert was tested by manually stopping the backend container. After Prometheus failed 
+to scrape the metrics endpoint for the configured duration, Grafana triggered the corresponding alert and sent notifications 
+through Discord and email.
+
+5xx alerts were tested by temporarily modifying the alert to also trigger on HTTP 4xx errors, which allowed me to trigger the 
+alert by simply sending a request to get a non-existent resource.
+
+Figure \ref{fig:alert_firing_example} shows an example of an alert notification in Discord, related to backend availability.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{assets/grafana_discord_alert.png}
+    \caption{Example of an alert firing in Grafana}
+    \label{fig:alert_firing_example}
+\end{figure}
+
+Once the problematic condition was resolved, Grafana automatically marked the alert as resolved and sent a recovery notification.
+This demonstrates the ability of the monitoring stack to both detect failures in real time and provide immediate feedback 
+when the system returns to a healthy state.
+
 \section{Conclusions}
+
+The implemented monitoring stack successfully provides centralized observability for both the infrastructure and the monitored Spring Boot application.
+
+By integrating Prometheus, Grafana, Loki, Promtail and Spring Boot Actuator, it was possible to collect and visualize a wide range of metrics and logs.
+
+The use of Grafana dashboards and alerting rules allows rapid identification of abnormal behavior and infrastructure issues. 
+Additionally, integrating Discord and SMTP notifications ensures that important events can be detected even when the 
+dashboards are not actively monitored.
+
+Overall, this project demonstrates how modern observability tools can be combined in order to build a complete monitoring 
+solution for containerized applications running in a homelab or a production environment.
 
 \end{document}
