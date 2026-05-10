@@ -23,7 +23,7 @@
 ]{hyperref}
 
 % ---------- Metadata ----------
-\title{\Huge Grafana Monitoring\\DevOps project P3}
+\title{\Huge Grafana Monitoring\\DevOps Project P3}
 \author{Dancea Radu-Ioan}
 \date{\today}
 
@@ -81,7 +81,7 @@ Figure \ref{fig:unraid_server} shows the physical machine used for this project.
     \label{fig:unraid_server}
 \end{figure}
 
-On this server, I have an Nginx reverse proxy running in a Docker container, which routes incoming HTTP/S requests to the various applications I have
+On this server, I have an Nginx reverse proxy running in a Docker container, which routes incoming HTTPS requests to the various applications I have
 running. The reverse proxy also handles certificate management using Let's Encrypt. I also use a wildcard domain that I registered with 
 Namecheap, which allows me to easily create subdomains for each application.
 
@@ -167,7 +167,7 @@ Prometheus was set up with a global scrape interval of 10 seconds and the follow
 
 Grafana is responsible for visualization and alert management. It connects directly to Prometheus and Loki as data sources and provides dashboards for infrastructure monitoring, application metrics and centralized logging.
 
-Grafana was also configured to handle alerting rules and notifications using Discord webhooks and SMTP email notifications, but more on this later.
+Grafana was also configured to handle alerting rules and notifications using Discord webhooks and SMTP email notifications. This topic is discussed in more detail later in the documentation.
 
 The dashboards were designed to provide a centralized overview of both the host machine and the monitored backend application.
 
@@ -258,7 +258,7 @@ in figure \ref{fig:backend_dashboard}.
 \subsection{Container Logging Dashboard}
 
 A separate dashboard was created for viewing centralized logs aggregated through Loki. The dashboard allows viewing
-logs from all of the containers running on the server and has a variable for selecting the container name, 
+logs from all of the containers running on the server and includes a variable for selecting the container name, 
 which allows the user to filter the output by container.
 
 This dashboard is useful for quickly identifying issues related to container crashes, application errors and reverse proxy problems.
@@ -306,7 +306,7 @@ overload the server and potentially impact application performance.
 \subsubsection{Unraid RAM Usage Alert}
 
 This alert monitors the total RAM usage of the server. The alert is triggered whenever the RAM usage exceeds 95\% for more than 
-2 minutes. This is particularly important because high memory pressure can lead to container instability or 
+two minutes. This is particularly important because high memory pressure can lead to container instability or 
 out-of-memory situations.
 
 \subsubsection{Array Free Space Alert}
