@@ -13,6 +13,7 @@
 \usepackage{indentfirst}
 \usepackage{xcolor}
 \usepackage{subcaption}
+\usepackage{float}
 \usepackage{makecell}
 \usepackage[
   colorlinks=true,
@@ -33,15 +34,135 @@
 \tableofcontents
 \newpage
 
-\section{Introduction and task description}
+\section{Introduction and Task Description}
+
+Modern applications require continuous monitoring in order to ensure reliability, performance and stability. Monitoring 
+systems provide visibility into the current state of the infrastructure and the application itself, while alerting systems enable 
+administrators to react quickly when abnormal behavior occurs.
+
+The goal of this practical assignment was to instrument an existing application with a monitoring and alerting stack using industry-standard 
+tools. The implemented solution includes:
+
+\begin{itemize}
+    \item \textbf{Prometheus} for metrics collection and storage
+    \item \textbf{Grafana} for metrics visualization and alerting
+    \item \textbf{Loki + Promtail} for centralized log aggregation
+    \item \textbf{Spring Boot Actuator + Micrometer} for application metrics exposure
+    \item \textbf{Node Exporter} for host-level hardware and operating system metrics
+\end{itemize}
+
+The monitored application is a Spring Boot backend running inside a Docker container on an Unraid server. The monitoring stack 
+was designed to provide visibility into:
+
+\begin{itemize}
+    \item Host machine resource utilization
+    \item Application health and availability
+    \item JVM statistics and memory usage
+    \item HTTP request statistics and backend errors
+    \item Reverse proxy and container logs
+\end{itemize}
+
+Additionally, multiple alerting rules were configured in Grafana in order to detect critical conditions such as high CPU usage, excessive 
+memory usage, low disk space, backend outages, and HTTP 5xx server errors. Notifications were configured using Discord webhooks and SMTP integration.
+
+The final result is a centralized observability platform capable of monitoring both infrastructure and application-level behavior in real time.
 
 \section{Monitored app and current configuration}
 
-\section{Grafana setup}
+For this assignment, I chose not to use AWS, Azure or any other cloud provider because I already have an Unraid server at home, which I use
+for hosting various applications and services. This allowed me to set up the entire monitoring stack without incurring additional costs. 
+Unraid is a popular operating system for home servers that provides a user-friendly interface for managing storage, Docker containers, and virtual machines.
+Figure \ref{fig:unraid_server} shows the physical machine used for this project.
 
-\subsection{Data sources}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\linewidth]{assets/unraid_server.jpg}
+    \caption{The physical Unraid server}
+    \label{fig:unraid_server}
+\end{figure}
 
-\subsection{Dashboards}
+On this server, I have an Nginx reverse proxy running in a Docker container, which routes incoming HTTP/S requests to the various applications I have
+running. The reverse proxy also handles certificate management using Let's Encrypt. I also use a wildcard domain that I registered with 
+Namecheap, which allows me to easily create subdomains for each application.
+
+For container and stack management, I use Portainer, which is a web-based interface for managing Docker environments. It allows me to easily 
+deploy and monitor containers, as well as manage volumes and networks.
+
+The application I chose to monitor is a Spring Boot backend. This backend is part of a larger application that I developed for personal use. In summary, the application is a simple
+file storage service that allows users to upload, download and manage files.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\linewidth]{assets/beamful.png}
+    \caption{The app interface}
+    \label{fig:beamful_interface}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{assets/reverse_proxy_diagram.png}
+    \caption{The reverse proxy setup}
+    \label{fig:reverse_proxy_setup}
+\end{figure}
+
+\section{The monitoring stack}
+
+\subsection{Spring Boot Actuator and Micrometer}
+
+In order to monitor the backend application, I integrated Spring Boot Actuator together with Micrometer Prometheus support.
+
+Spring Boot Actuator provides monitoring and management endpoints that expose useful information about the internal state of the application. 
+By default, Actuator exposes endpoints related to health checks, metrics, application information and runtime statistics.
+
+Micrometer acts as an abstraction layer for application metrics and automatically exposes them in a format compatible with Prometheus.
+
+For security reasons, the Actuator endpoints were configured to run on a dedicated internal management port instead of the main application port. 
+This ensures that monitoring-related endpoints are accessible only internally through Docker networking and are not exposed publicly.
+
+The following metrics are automatically collected and exposed:
+
+\begin{itemize}
+    \item JVM heap and memory usage
+    \item JVM thread statistics
+    \item HTTP request count
+    \item HTTP request latency
+    \item HTTP 5xx error rates
+\end{itemize}
+
+These metrics are periodically scraped by Prometheus and later visualized inside Grafana dashboards.
+
+\subsection{Monitoring Stack Architecture}
+
+The monitoring infrastructure was deployed entirely using Docker containers. All monitoring-related services were grouped inside a dedicated 
+Docker Compose stack in order to simplify deployment, maintenance and service communication.
+
+A shared external Docker network named \texttt{beamful-monitoring} was created so that services running in separate Docker Compose stacks 
+could communicate internally without exposing additional ports publicly.
+
+Additionally, the monitored Spring Boot backend container was also attached to the same shared Docker network, allowing Prometheus to scrape 
+application metrics directly through Docker DNS resolution.
+
+Figure \ref{fig:monitoring_architecture} illustrates the overall architecture of the monitoring stack and its integration with the existing application.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{assets/monitoring_communication_diagram.png}
+    \caption{Monitoring stack architecture}
+    \label{fig:monitoring_architecture}
+\end{figure}
+
+\subsection{Prometheus}
+adasd
+
+\subsection{Grafana}
+
+\subsection{Node Exporter}
+
+\subsection{Loki}
+
+\subsection{Promtail}
+
+\section{The dashboards}
 
 \section{Alert configuration}
 
