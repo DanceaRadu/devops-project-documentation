@@ -209,7 +209,76 @@ This allowed filtering logs individually for each reverse proxy host directly fr
 
 \section{The dashboards}
 
+Several dashboards were created in Grafana in order to monitor both infrastructure-level and application-level behavior. The created dashboards are as follows:
+
+\subsection{Infrastructure Dashboard}
+
+The infrastructure dashboard focuses on host-level metrics collected through Node Exporter. The dashboard contains panels for:
+
+\begin{itemize}
+    \item CPU utilization
+    \item RAM usage
+    \item Available disk space
+    \item Network traffic
+\end{itemize}
+
+Threshold coloring was configured for multiple panels in order to visually indicate abnormal and high values. For example, the 
+CPU graph turns red when the CPU utilization exceeds 90\%.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{assets/infrastructure_dashboard.png}
+    \caption{The infrastructure monitoring dashboard}
+    \label{fig:infrastructure_dashboard}
+\end{figure}
+
+\subsection{Backend Monitoring Dashboard}
+
+A dedicated dashboard was created for monitoring the Spring Boot application. The dashboard contains logs for both the
+container itself, as well as logs from Nginx (such as incoming requests). The dashboard also displays metrics related to:
+
+\begin{itemize}
+    \item JVM memory usage
+    \item Heap utilization
+    \item Average request time
+    \item Thread count
+    \item Error rates
+\end{itemize}
+
+This allows for quick identification of backend performance issues and abnormal application behavior. The dashboard can be seen
+in figure \ref{fig:backend_dashboard}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{assets/backend_dashboard.png}
+    \caption{Spring Boot backend monitoring dashboard}
+    \label{fig:backend_dashboard}
+\end{figure}
+
+\subsection{Container Logging Dashboard}
+
+A separate dashboard was created for viewing centralized logs aggregated through Loki. The dashboard allows viewing
+logs from all of the containers running on the server and has a variable for selecting the container name, 
+which allows the user to filter the output by container.
+
+This dashboard is useful for quickly identifying issues related to container crashes, application errors and reverse proxy problems.
+In our case, it allows us to easily view Nginx container logs in order to identify potential issues with incoming requests or SSL 
+certificate problems. The dashboard can be seen in figure \ref{fig:logging_dashboard}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{assets/centralized_logging_dashboard.png}
+    \caption{Centralized logging dashboard}
+    \label{fig:logging_dashboard}
+\end{figure}
+
+\newpage
+
 \section{Alert configuration}
+
+\subsection{Relevant alerts chosen}
+
+\subsection{Example alert firing}
 
 \section{Conclusions}
 
